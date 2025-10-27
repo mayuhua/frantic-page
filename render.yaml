@@ -1,0 +1,29 @@
+services:
+  # Static Site
+  - type: web
+    name: frantic-personal-website
+    env: static
+    rootDir: build
+    buildCommand: npm run build
+    staticPublishPath: ./build
+
+    # Environment variables
+    envVars:
+      - key: NODE_VERSION
+        value: 18
+
+    # Build hooks
+    buildFilter:
+      paths:
+        - src/**
+        - public/**
+        - package.json
+        - package-lock.json
+        - tailwind.config.js
+
+    # Auto-deploy configuration
+    autoDeploy: true
+
+    # Custom domains (if needed)
+    # domains:
+    #   - your-domain.com
