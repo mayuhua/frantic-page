@@ -51,15 +51,28 @@ function App() {
           </div>
 
           <div className="flex justify-center space-x-6 mb-4">
-            <button className="text-zaku-light-green hover:text-zaku-accent transition-colors">
+            <a
+              href="https://www.linkedin.com/in/franticma"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-zaku-light-green hover:text-zaku-accent transition-colors"
+            >
               LinkedIn
-            </button>
-            <button className="text-zaku-light-green hover:text-zaku-accent transition-colors">
+            </a>
+            <a
+              href="https://github.com/mayuhua"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-zaku-light-green hover:text-zaku-accent transition-colors"
+            >
               GitHub
-            </button>
-            <button className="text-zaku-light-green hover:text-zaku-accent transition-colors">
+            </a>
+            <a
+              href="mailto:frantic.ma@gmail.com"
+              className="text-zaku-light-green hover:text-zaku-accent transition-colors"
+            >
               Email
-            </button>
+            </a>
           </div>
 
           <div className="text-xs text-gray-500">
