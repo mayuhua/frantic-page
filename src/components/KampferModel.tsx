@@ -1,6 +1,6 @@
 import React, { Suspense, useState } from 'react';
 import { Canvas } from '@react-three/fiber';
-import { OrbitControls, PerspectiveCamera } from '@react-three/drei';
+import { OrbitControls, PerspectiveCamera, Environment, ContactShadows } from '@react-three/drei';
 import GLBModelLoader from './GLBModelLoader';
 
 // Custom 3D Kampfer Model (fallback)
@@ -52,15 +52,21 @@ const KampferFallback: React.FC = () => {
 const ModelWrapper: React.FC = () => {
   const [hasError, setHasError] = useState(false);
 
+  // Change this to use different GLB files:
+  // "/models/kampfer.glb" - original (10.8MB)
+  // "/models/kampfer-1.glb" - new larger version (67.8MB)
+  // "/models/kampfer-compressed.glb" - compressed version (78.6MB)
+  const modelUrl = "/models/kampfer.glb"; // <- CHANGE THIS LINE to switch models
+
   if (hasError) {
     return <KampferFallback />;
   }
 
   return (
     <GLBModelLoader
-      url="/models/kampfer.glb"
-      position={[0, -8, 0]}
-      scale={[0.3, 0.3, 0.3]}
+      url={modelUrl}
+      position={[0, -4, 0]}
+      scale={[0.008, 0.008, 0.008]}
       fallback={<KampferFallback />}
       onError={() => setHasError(true)}
     />
@@ -93,22 +99,22 @@ const KampferModel: React.FC = () => {
         <pointLight position={[-10, -10, -10]} intensity={0.3} color="#4fc3f7" />
         <pointLight position={[10, -10, 10]} intensity={0.2} color="#ff6b6b" />
 
-        {/* Environment - temporarily disabled */}
-        {/* <Environment preset="studio" /> */}
+        {/* Environment */}
+        <Environment preset="studio" />
 
         {/* Kampfer Model */}
         <Suspense fallback={<KampferFallback />}>
           <ModelWrapper />
         </Suspense>
 
-        {/* Ground/Shadows - temporarily disabled */}
-        {/* <ContactShadows
+        {/* Ground/Shadows */}
+        <ContactShadows
           position={[0, -2, 0]}
           opacity={0.3}
           scale={8}
           blur={2}
           far={3}
-        /> */}
+        />
       </Canvas>
     </div>
   );

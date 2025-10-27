@@ -19,6 +19,10 @@ const ModelContent: React.FC<GLBModelLoaderProps> = ({
 }) => {
   const gltf = useGLTF(url);
 
+  console.log('Loading GLTF model from:', url);
+  console.log('GLTF loaded:', !!gltf);
+  console.log('GLTF scene:', !!gltf?.scene);
+
   if (!gltf || !gltf.scene) {
     return fallback as React.ReactElement || null;
   }
@@ -35,8 +39,8 @@ const ModelContent: React.FC<GLBModelLoaderProps> = ({
 // Wrapper component with error boundary
 const GLBModelLoader: React.FC<GLBModelLoaderProps> = ({
   url,
-  position = [0, -1, 0],
-  scale = [0.3, 0.3, 0.3],
+  position = [0, -8, 0],
+  scale = [0.1, 0.1, 0.1],
   fallback = null,
   onError
 }) => {
