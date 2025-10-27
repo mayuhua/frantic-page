@@ -87,12 +87,19 @@ class ModelRecommendationEngine {
     // Filter models based on hard requirements
     const eligibleModels = this.filterEligibleModels(models, metrics);
 
+    // If no models meet requirements, fall back to all models with relaxed requirements
+    const finalModels = eligibleModels.length > 0 ? eligibleModels : models;
+
+    if (finalModels.length === 0) {
+      throw new Error('No models available for selection');
+    }
+
     if (eligibleModels.length === 0) {
-      throw new Error('No models meet the minimum requirements for this device');
+      console.warn('⚠️ No models meet minimum requirements, using all models with relaxed filtering');
     }
 
     // Score each model
-    const scoredModels = eligibleModels.map(model => ({
+    const scoredModels = finalModels.map(model => ({
       model,
       score: this.calculateModelScore(model, metrics, weights, userPreferences),
       reasoning: this.generateReasoning(model, metrics, userPreferences)
@@ -104,6 +111,13 @@ class ModelRecommendationEngine {
     const bestMatch = scoredModels[0];
     const alternatives = scoredModels.slice(1, 4).map(s => s.model); // Top 3 alternatives
 
+    const warnings = this.generateWarnings(bestMatch.model, metrics);
+
+    // Add fallback warning if no models met requirements
+    if (eligibleModels.length === 0) {
+      warnings.push('Device performance could not be accurately detected - using default model selection');
+    }
+
     const recommendation: ModelRecommendation = {
       modelId: bestMatch.model.id,
       confidence: Math.min(bestMatch.score / 100, 1),
@@ -112,7 +126,7 @@ class ModelRecommendationEngine {
       estimatedLoadTime: this.estimateLoadTime(bestMatch.model, metrics),
       estimatedMemoryUsage: this.estimateMemoryUsage(bestMatch.model, metrics),
       performanceImpact: this.assessPerformanceImpact(bestMatch.model, metrics),
-      warnings: this.generateWarnings(bestMatch.model, metrics),
+      warnings,
       benefits: this.generateBenefits(bestMatch.model, metrics)
     };
 
