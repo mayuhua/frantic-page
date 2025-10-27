@@ -17,28 +17,28 @@ const logoData = [
     category: 'E-commerce',
     color: '#000000',
     logoText: 'AliExpress',
-    logoUrl: '/logos/AliExpress.png'
+    logoUrl: '/logos/aliexpress.png'
   },
   {
     name: 'TikTok',
     category: 'Social',
     color: '#000000',
     logoText: 'TikTok',
-    logoUrl: '/logos/TikTok.png'
+    logoUrl: '/logos/tiktok.png'
   },
   {
     name: 'Temu',
     category: 'E-commerce',
     color: '#000000',
     logoText: 'Temu',
-    logoUrl: '/logos/Temu.png'
+    logoUrl: '/logos/temu.png'
   },
   {
     name: 'Alibaba',
     category: 'E-commerce',
     color: '#000000',
     logoText: 'Alibaba',
-    logoUrl: '/logos/Alibaba.png'
+    logoUrl: '/logos/alibaba.png'
   },
   {
     name: 'Cider',
@@ -52,21 +52,21 @@ const logoData = [
     category: 'Gaming',
     color: '#000000',
     logoText: 'Nintendo',
-    logoUrl: '/logos/Nintendo.png'
+    logoUrl: '/logos/nintendo.png'
   },
   {
     name: 'LightInTheBox',
     category: 'E-commerce',
     color: '#000000',
     logoText: 'LightInTheBox',
-    logoUrl: '/logos/LightInTheBox.png'
+    logoUrl: '/logos/lightinthebox.png'
   },
   {
     name: 'Ochama',
     category: 'E-commerce',
     color: '#000000',
     logoText: 'OCHAMA',
-    logoUrl: '/logos/Ochama.png'
+    logoUrl: '/logos/ochama.png'
   },
   {
     name: 'More & More',

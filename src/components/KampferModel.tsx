@@ -1,15 +1,68 @@
-import React, { Suspense } from 'react';
+import React, { Suspense, useState } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls, PerspectiveCamera, Environment, ContactShadows } from '@react-three/drei';
 import GLBModelLoader from './GLBModelLoader';
 
-// Placeholder component for loading state
-const KampferPlaceholder: React.FC = () => {
+// Custom 3D Kampfer Model (fallback)
+const KampferFallback: React.FC = () => {
   return (
-    <mesh>
-      <boxGeometry args={[1, 2, 1]} />
-      <meshStandardMaterial color="#1e3a8a" wireframe />
-    </mesh>
+    <group position={[0, -8, 0]} scale={[0.3, 0.3, 0.3]}>
+      {/* Body */}
+      <mesh position={[0, 2, 0]}>
+        <boxGeometry args={[2, 3, 1]} />
+        <meshStandardMaterial color="#1e3a8a" metalness={0.8} roughness={0.2} />
+      </mesh>
+
+      {/* Head */}
+      <mesh position={[0, 4, 0]}>
+        <boxGeometry args={[1.5, 1.5, 1]} />
+        <meshStandardMaterial color="#4fc3f7" metalness={0.8} roughness={0.2} />
+      </mesh>
+
+      {/* Arms */}
+      <mesh position={[-1.5, 2.5, 0]}>
+        <boxGeometry args={[1, 2, 0.5]} />
+        <meshStandardMaterial color="#1e3a8a" metalness={0.8} roughness={0.2} />
+      </mesh>
+      <mesh position={[1.5, 2.5, 0]}>
+        <boxGeometry args={[1, 2, 0.5]} />
+        <meshStandardMaterial color="#1e3a8a" metalness={0.8} roughness={0.2} />
+      </mesh>
+
+      {/* Legs */}
+      <mesh position={[-0.6, 0, 0]}>
+        <boxGeometry args={[0.8, 2, 0.8]} />
+        <meshStandardMaterial color="#1e3a8a" metalness={0.8} roughness={0.2} />
+      </mesh>
+      <mesh position={[0.6, 0, 0]}>
+        <boxGeometry args={[0.8, 2, 0.8]} />
+        <meshStandardMaterial color="#1e3a8a" metalness={0.8} roughness={0.2} />
+      </mesh>
+
+      {/* Antenna/V-Fin */}
+      <mesh position={[0, 5, 0]}>
+        <coneGeometry args={[0.3, 1, 4]} />
+        <meshStandardMaterial color="#ff6b6b" metalness={0.8} roughness={0.2} />
+      </mesh>
+    </group>
+  );
+};
+
+// Error boundary component
+const ModelWrapper: React.FC = () => {
+  const [hasError, setHasError] = useState(false);
+
+  if (hasError) {
+    return <KampferFallback />;
+  }
+
+  return (
+    <GLBModelLoader
+      url="/models/kampfer.glb"
+      position={[0, -8, 0]}
+      scale={[0.3, 0.3, 0.3]}
+      onError={() => setHasError(true)}
+    />
   );
 };
 
@@ -43,12 +96,8 @@ const KampferModel: React.FC = () => {
         <Environment preset="studio" />
 
         {/* Kampfer Model */}
-        <Suspense fallback={<KampferPlaceholder />}>
-          <GLBModelLoader
-            url="/models/Kampfer.glb"
-            position={[0, -8, 0]}
-            scale={[0.3, 0.3, 0.3]}
-          />
+        <Suspense fallback={<KampferFallback />}>
+          <ModelWrapper />
         </Suspense>
 
         {/* Ground/Shadows */}
