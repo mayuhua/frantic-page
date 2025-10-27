@@ -43,7 +43,7 @@ function App() {
               <span className="text-black font-black text-lg">K</span>
             </div>
             <h3 className="text-xl font-black text-zaku-light-green zaku-text mb-2">
-              KAMPFER PILOT
+              Frantic Unit
             </h3>
             <p className="text-gray-400 text-sm">
               Engineering the future, one line of code at a time
@@ -76,7 +76,7 @@ function App() {
           </div>
 
           <div className="text-xs text-gray-500">
-            © 2024 Kampfer Pilot. Built with React, Three.js, and lots of ☕
+            © 2025 Frantic Unit. Built with React, Three.js, and lots of ☕
           </div>
         </div>
       </footer>
