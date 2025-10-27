@@ -1,7 +1,4 @@
-import React, { useRef, useState } from 'react';
-import { Canvas, useFrame } from '@react-three/fiber';
-import { OrbitControls } from '@react-three/drei';
-import * as THREE from 'three';
+import React, { useState } from 'react';
 
 // E-commerce and brand partners with file-based logos
 const logoData = [
@@ -77,61 +74,6 @@ const logoData = [
   }
 ];
 
-// Floating Logo Cube Component
-function LogoCube({ logo, index }: { logo: typeof logoData[0]; index: number }) {
-  const meshRef = useRef<THREE.Mesh>(null);
-
-  useFrame((state) => {
-    if (meshRef.current) {
-      const time = state.clock.elapsedTime;
-      const offset = index * 0.5;
-
-      // Individual floating animation
-      meshRef.current.position.y = Math.sin(time + offset) * 0.2;
-      meshRef.current.rotation.x = Math.sin(time * 0.5 + offset) * 0.1;
-      meshRef.current.rotation.y = Math.cos(time * 0.3 + offset) * 0.1;
-    }
-  });
-
-  // Enhanced horizontal layout with better left-right distribution
-  const cols = 4; // Increased columns for better horizontal spread
-  const totalLogos = logoData.length;
-  const rows = Math.ceil(totalLogos / cols);
-
-  const col = index % cols;
-  const row = Math.floor(index / cols);
-
-  // Calculate position with better horizontal spread
-  const xPos = (col - (cols - 1) / 2) * 2.2; // Wider horizontal spacing
-  const yPos = (row - (rows - 1) / 2) * 1.8; // Adjust vertical spacing
-
-  return (
-    <mesh
-      ref={meshRef}
-      position={[xPos, yPos, 0]}
-    >
-      <boxGeometry args={[1.2, 1.2, 0.3]} />
-      <meshStandardMaterial
-        color={logo.color}
-        metalness={0.8}
-        roughness={0.2}
-        emissive={logo.color}
-        emissiveIntensity={0.1}
-      />
-    </mesh>
-  );
-}
-
-// 3D Logo Display
-function LogoScene() {
-  return (
-    <>
-      {logoData.map((logo, index) => (
-        <LogoCube key={logo.name} logo={logo} index={index} />
-      ))}
-    </>
-  );
-}
 
 const LogoGallery: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState<string>('All');

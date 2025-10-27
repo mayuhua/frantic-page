@@ -1,6 +1,6 @@
 import React, { Suspense, useState } from 'react';
 import { Canvas } from '@react-three/fiber';
-import { OrbitControls, PerspectiveCamera, Environment, ContactShadows } from '@react-three/drei';
+import { OrbitControls, PerspectiveCamera } from '@react-three/drei';
 import GLBModelLoader from './GLBModelLoader';
 
 // Custom 3D Kampfer Model (fallback)
@@ -61,6 +61,7 @@ const ModelWrapper: React.FC = () => {
       url="/models/kampfer.glb"
       position={[0, -8, 0]}
       scale={[0.3, 0.3, 0.3]}
+      fallback={<KampferFallback />}
       onError={() => setHasError(true)}
     />
   );
@@ -92,22 +93,22 @@ const KampferModel: React.FC = () => {
         <pointLight position={[-10, -10, -10]} intensity={0.3} color="#4fc3f7" />
         <pointLight position={[10, -10, 10]} intensity={0.2} color="#ff6b6b" />
 
-        {/* Environment */}
-        <Environment preset="studio" />
+        {/* Environment - temporarily disabled */}
+        {/* <Environment preset="studio" /> */}
 
         {/* Kampfer Model */}
         <Suspense fallback={<KampferFallback />}>
           <ModelWrapper />
         </Suspense>
 
-        {/* Ground/Shadows */}
-        <ContactShadows
+        {/* Ground/Shadows - temporarily disabled */}
+        {/* <ContactShadows
           position={[0, -2, 0]}
           opacity={0.3}
           scale={8}
           blur={2}
           far={3}
-        />
+        /> */}
       </Canvas>
     </div>
   );

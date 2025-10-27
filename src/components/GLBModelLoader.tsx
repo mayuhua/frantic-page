@@ -1,6 +1,5 @@
 import React, { Suspense } from 'react';
 import { useGLTF } from '@react-three/drei';
-import * as THREE from 'three';
 
 interface GLBModelLoaderProps {
   url: string;
@@ -21,7 +20,7 @@ const ModelContent: React.FC<GLBModelLoaderProps> = ({
   const gltf = useGLTF(url);
 
   if (!gltf || !gltf.scene) {
-    return (fallback || <div>Loading model...</div>) as React.ReactElement;
+    return fallback as React.ReactElement || null;
   }
 
   return (
@@ -34,15 +33,15 @@ const ModelContent: React.FC<GLBModelLoaderProps> = ({
 };
 
 // Wrapper component with error boundary
-const GLBModelLoader = ({
+const GLBModelLoader: React.FC<GLBModelLoaderProps> = ({
   url,
   position = [0, -1, 0],
   scale = [0.3, 0.3, 0.3],
   fallback = null,
   onError
-}: GLBModelLoaderProps): React.ReactElement => {
+}) => {
   return (
-    <Suspense fallback={(fallback || <div>Loading model...</div>) as React.ReactElement}>
+    <Suspense fallback={fallback || null}>
       <ErrorBoundary fallback={fallback} onError={onError}>
         <ModelContent
           url={url}
@@ -86,7 +85,7 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
 
   render() {
     if (this.state.hasError) {
-      return (this.props.fallback || <div>Loading model...</div>) as React.ReactElement;
+      return this.props.fallback || null;
     }
 
     return this.props.children;

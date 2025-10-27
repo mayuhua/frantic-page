@@ -1,35 +1,6 @@
 import React, { useState } from 'react';
 import { Canvas } from '@react-three/fiber';
-import { OrbitControls, Float, Text } from '@react-three/drei';
-
-// 3D Floating Text Component
-function FloatingText({ text, position, color = '#2d6a4f' }: {
-  text: string;
-  position: [number, number, number];
-  color?: string;
-}) {
-  return (
-    <Float speed={2} rotationIntensity={0.5} floatIntensity={0.5}>
-      <Text
-        position={position}
-        fontSize={0.8}
-        color={color}
-        anchorX="center"
-        anchorY="middle"
-        material-toneMapped={false}
-      >
-        {text}
-        <meshStandardMaterial
-          color={color}
-          metalness={0.8}
-          roughness={0.2}
-          emissive={color}
-          emissiveIntensity={0.1}
-        />
-      </Text>
-    </Float>
-  );
-}
+import { OrbitControls } from '@react-three/drei';
 
 // 3D Scene
 function VibeScene() {
@@ -39,10 +10,6 @@ function VibeScene() {
       <directionalLight position={[10, 10, 5]} intensity={1} />
       <pointLight position={[-10, -10, -10]} intensity={0.3} color="#2d6a4f" />
       <pointLight position={[10, -10, 10]} intensity={0.2} color="#ff6b35" />
-
-      <FloatingText text="VIBE" position={[-2, 1, 0]} color="#2d6a4f" />
-      <FloatingText text="CODING" position={[2, 1, 0]} color="#ff6b35" />
-      <FloatingText text="∞" position={[0, -1, 0]} color="#1a4d2e" />
 
       <OrbitControls enablePan={false} autoRotate autoRotateSpeed={0.5} />
     </>
