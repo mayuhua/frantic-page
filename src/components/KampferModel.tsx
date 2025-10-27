@@ -54,15 +54,15 @@ const KampferFallback: React.FC = () => {
 // Model configurations
 const availableModels: ModelConfiguration[] = [
   {
-    id: 'kampfer-standard',
-    name: 'Kampfer (Standard)',
+    id: 'zeon-standard',
+    name: 'Zeon (Standard)',
     url: '/models/zeon.glb',
     fileSize: 857 * 1024, // 857 KB
     quality: 'medium',
     description: 'Balanced version with good quality and reasonable performance',
     features: ['Good quality', 'Balanced performance', 'Recommended for most users'],
-    position: [0, -4, 0], // Default position for kampfer.glb
-    scale: [0.008, 0.008, 0.008], // Default scale for kampfer.glb
+    position: [0, -4, 0], // Default position for zeon.glb
+    scale: [0.008, 0.008, 0.008], // Default scale for zeon.glb
     minRequirements: {
       networkSpeed: 2,
       deviceMemory: 4,
@@ -91,7 +91,7 @@ const availableModels: ModelConfiguration[] = [
 
 
 const KampferModel: React.FC = () => {
-  const [selectedModelId, setSelectedModelId] = useState<string>('kampfer-standard');
+  const [selectedModelId, setSelectedModelId] = useState<string>('zeon-standard');
   const [loadingStatus, setLoadingStatus] = useState<LoadingStatus>('pending');
   const [loadingProgress, setLoadingProgress] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
