@@ -1,13 +1,49 @@
 import React, { Suspense } from 'react';
-import { useGLTF } from '@react-three/drei';
+import { useGLTF, useProgress } from '@react-three/drei';
 
 interface GLBModelLoaderProps {
   url: string;
   position?: [number, number, number];
   scale?: [number, number, number];
   fallback?: React.ReactNode;
-  onError?: () => void;
+  onError?: (error: Error) => void;
+  onProgress?: (progress: { loaded: number; total: number; percentage: number }) => void;
+  onLoadStart?: () => void;
+  onLoadComplete?: () => void;
 }
+
+// Progress tracking component
+const ProgressTracker: React.FC<{
+  onProgress?: (progress: { loaded: number; total: number; percentage: number }) => void;
+  onLoadStart?: () => void;
+  onLoadComplete?: () => void;
+}> = ({ onProgress, onLoadStart, onLoadComplete }) => {
+  const { progress, loaded, total } = useProgress();
+
+  React.useEffect(() => {
+    if (progress === 0 && onLoadStart) {
+      onLoadStart();
+    }
+  }, [progress, onLoadStart]);
+
+  React.useEffect(() => {
+    if (onProgress) {
+      onProgress({
+        loaded,
+        total,
+        percentage: Math.round(progress)
+      });
+    }
+  }, [loaded, total, progress, onProgress]);
+
+  React.useEffect(() => {
+    if (progress === 100 && onLoadComplete) {
+      onLoadComplete();
+    }
+  }, [progress, onLoadComplete]);
+
+  return null; // This component doesn't render anything
+};
 
 // Inner component that uses the hook
 const ModelContent: React.FC<GLBModelLoaderProps> = ({
@@ -15,24 +51,35 @@ const ModelContent: React.FC<GLBModelLoaderProps> = ({
   position,
   scale,
   fallback,
-  onError
+  onError,
+  onProgress,
+  onLoadStart,
+  onLoadComplete
 }) => {
   const gltf = useGLTF(url);
 
-  console.log('Loading GLTF model from:', url);
-  console.log('GLTF loaded:', !!gltf);
-  console.log('GLTF scene:', !!gltf?.scene);
+  console.log('📦 Loading GLTF model from:', url);
+  console.log('✅ GLTF loaded:', !!gltf);
+  console.log('🎬 GLTF scene:', !!gltf?.scene);
+  console.log('🎭 GLTF scene children count:', gltf?.scene?.children?.length || 0);
 
   if (!gltf || !gltf.scene) {
     return fallback as React.ReactElement || null;
   }
 
   return (
-    <primitive
-      object={gltf.scene}
-      position={position}
-      scale={scale}
-    />
+    <>
+      <ProgressTracker
+        onProgress={onProgress}
+        onLoadStart={onLoadStart}
+        onLoadComplete={onLoadComplete}
+      />
+      <primitive
+        object={gltf.scene}
+        position={position}
+        scale={scale}
+      />
+    </>
   );
 };
 
@@ -42,7 +89,10 @@ const GLBModelLoader: React.FC<GLBModelLoaderProps> = ({
   position = [0, -8, 0],
   scale = [0.1, 0.1, 0.1],
   fallback = null,
-  onError
+  onError,
+  onProgress,
+  onLoadStart,
+  onLoadComplete
 }) => {
   return (
     <Suspense fallback={fallback || null}>
@@ -53,6 +103,9 @@ const GLBModelLoader: React.FC<GLBModelLoaderProps> = ({
           scale={scale}
           fallback={fallback}
           onError={onError}
+          onProgress={onProgress}
+          onLoadStart={onLoadStart}
+          onLoadComplete={onLoadComplete}
         />
       </ErrorBoundary>
     </Suspense>
@@ -63,7 +116,7 @@ const GLBModelLoader: React.FC<GLBModelLoaderProps> = ({
 interface ErrorBoundaryProps {
   children: React.ReactNode;
   fallback?: React.ReactNode;
-  onError?: () => void;
+  onError?: (error: Error) => void;
 }
 
 interface ErrorBoundaryState {
@@ -83,7 +136,7 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
   componentDidCatch(error: Error) {
     console.error('Failed to load 3D model:', error);
     if (this.props.onError) {
-      this.props.onError();
+      this.props.onError(error);
     }
   }
 

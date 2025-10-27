@@ -1,7 +1,10 @@
-import React, { Suspense, useState } from 'react';
+import React, { Suspense, useState, useCallback } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls, PerspectiveCamera, Environment, ContactShadows } from '@react-three/drei';
 import GLBModelLoader from './GLBModelLoader';
+import SmartModelSelector from './SmartModelSelector';
+import ModelLoadingIndicator, { LoadingStatus } from './ModelLoadingIndicator';
+import { ModelConfiguration } from '../utils/modelRecommendationEngine';
 
 // Custom 3D Kampfer Model (fallback)
 const KampferFallback: React.FC = () => {
@@ -48,34 +51,101 @@ const KampferFallback: React.FC = () => {
   );
 };
 
-// Error boundary component
-const ModelWrapper: React.FC = () => {
-  const [hasError, setHasError] = useState(false);
-
-  // Change this to use different GLB files:
-  // "/models/kampfer.glb" - original (10.8MB)
-  // "/models/kampfer-1.glb" - new larger version (67.8MB)
-  // "/models/kampfer-compressed.glb" - compressed version (78.6MB)
-  const modelUrl = "/models/kampfer.glb"; // <- CHANGE THIS LINE to switch models
-
-  if (hasError) {
-    return <KampferFallback />;
+// Model configurations
+const availableModels: ModelConfiguration[] = [
+  {
+    id: 'kampfer-standard',
+    name: 'Kampfer (Standard)',
+    url: '/models/zeon.glb',
+    fileSize: 857 * 1024, // 857 KB
+    quality: 'medium',
+    description: 'Balanced version with good quality and reasonable performance',
+    features: ['Good quality', 'Balanced performance', 'Recommended for most users'],
+    position: [0, -4, 0], // Default position for kampfer.glb
+    scale: [0.008, 0.008, 0.008], // Default scale for kampfer.glb
+    minRequirements: {
+      networkSpeed: 2,
+      deviceMemory: 4,
+      gpuTier: 'medium'
+    },
+    recommendedFor: ['Desktop users', 'Standard connections', 'Modern hardware']
+  },
+  {
+    id: 'kampfer-hd',
+    name: 'Kampfer (HD)',
+    url: '/models/kampfer-1-optimized.glb',
+    fileSize: 67.8 * 1024 * 1024, // 67.8 MB
+    quality: 'high',
+    description: 'High definition version with maximum detail and quality',
+    features: ['Maximum detail', 'Best visual quality', 'Advanced lighting'],
+    position: [0, -5, 0], // Specific position for kampfer-1-optimized.glb
+    scale: [0.3, 0.3, 0.3], // Specific scale for kampfer-1-optimized.glb
+    minRequirements: {
+      networkSpeed: 10,
+      deviceMemory: 8,
+      gpuTier: 'high'
+    },
+    recommendedFor: ['High-end devices', 'Fast connections', 'Quality enthusiasts']
   }
+];
 
-  return (
-    <GLBModelLoader
-      url={modelUrl}
-      position={[0, -4, 0]}
-      scale={[0.008, 0.008, 0.008]}
-      fallback={<KampferFallback />}
-      onError={() => setHasError(true)}
-    />
-  );
-};
 
 const KampferModel: React.FC = () => {
+  const [selectedModelId, setSelectedModelId] = useState<string>('kampfer-standard');
+  const [loadingStatus, setLoadingStatus] = useState<LoadingStatus>('pending');
+  const [loadingProgress, setLoadingProgress] = useState<any>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  // Get current model configuration
+  const currentModel = availableModels.find(m => m.id === selectedModelId) || availableModels[0];
+
+  // Handle model change
+  const handleModelChange = useCallback((modelId: string) => {
+    const model = availableModels.find(m => m.id === modelId);
+    console.log('🔄 Switching to model:', modelId, model?.name || 'Unknown');
+    console.log('📁 Model URL:', model?.url || 'Not found');
+    console.log('📍 Model Position:', model?.position || [0, -4, 0]);
+    console.log('📏 Model Scale:', model?.scale || [0.008, 0.008, 0.008]);
+    setSelectedModelId(modelId);
+    setError(null);
+    setLoadingStatus('loading');
+  }, []);
+
+  // Handle loading progress
+  const handleLoadingProgress = useCallback((progress: any) => {
+    setLoadingProgress(progress);
+    if (progress.percentage >= 100) {
+      setLoadingStatus('processing');
+      setTimeout(() => {
+        setLoadingStatus('ready');
+        setTimeout(() => setLoadingStatus('pending'), 2000);
+      }, 1000);
+    }
+  }, []);
+
+  // Handle loading error
+  const handleLoadingError = useCallback((error: Error) => {
+    console.error('3D model loading error:', error);
+    setError('Failed to load 3D model');
+    setLoadingStatus('error');
+  }, []);
+
+  // Handle loading cancel
+  const handleLoadingCancel = useCallback(() => {
+    setLoadingStatus('pending');
+    setLoadingProgress(null);
+    setError(null);
+  }, []);
+
+  // Handle loading retry
+  const handleLoadingRetry = useCallback(() => {
+    setError(null);
+    setLoadingStatus('loading');
+  }, []);
+
   return (
-    <div className="w-full h-full">
+    <div className="w-full h-full relative">
+      {/* Canvas for 3D Scene */}
       <Canvas shadows className="opacity-80">
         <PerspectiveCamera makeDefault position={[6, 4, 6]} />
         <OrbitControls
@@ -104,7 +174,16 @@ const KampferModel: React.FC = () => {
 
         {/* Kampfer Model */}
         <Suspense fallback={<KampferFallback />}>
-          <ModelWrapper />
+          <GLBModelLoader
+            url={currentModel.url}
+            position={currentModel.position || [0, -4, 0]}
+            scale={currentModel.scale || [0.008, 0.008, 0.008]}
+            fallback={<KampferFallback />}
+            onError={handleLoadingError}
+            onProgress={handleLoadingProgress}
+            onLoadStart={() => setLoadingStatus('loading')}
+            onLoadComplete={() => setLoadingStatus('ready')}
+          />
         </Suspense>
 
         {/* Ground/Shadows */}
@@ -116,6 +195,30 @@ const KampferModel: React.FC = () => {
           far={3}
         />
       </Canvas>
+
+      {/* Smart Model Selector - Outside Canvas */}
+      <SmartModelSelector
+        models={availableModels}
+        onModelChange={handleModelChange}
+        currentModelId={selectedModelId}
+        showAdvancedControls={true}
+        position="bottom-right"
+        autoDetect={true}
+      />
+
+      {/* Loading Indicator - Outside Canvas */}
+      {(loadingStatus === 'loading' || loadingStatus === 'processing' || loadingStatus === 'error') && (
+        <ModelLoadingIndicator
+          status={loadingStatus}
+          progress={loadingProgress}
+          modelName={currentModel.name}
+          fileSize={currentModel.fileSize}
+          error={error || undefined}
+          onCancel={handleLoadingCancel}
+          onRetry={handleLoadingRetry}
+          showDetails={true}
+        />
+      )}
     </div>
   );
 };
